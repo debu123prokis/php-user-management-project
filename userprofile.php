@@ -1,7 +1,7 @@
 <?php
 
 include 'includes/connection.php';
-$title = 'User Login Form';
+$title = 'User Profile';
 include 'includes/header.php';
 ?>
 
@@ -17,7 +17,7 @@ include 'includes/header.php';
                         </div>
                         <div class="col-xl-6">
                             <div class="card-body p-md-5 text-black">
-                                <h3 class="mb-5 text-uppercase">User login form</h3>
+                                <h3 class="mb-5 text-uppercase">User Profile Page</h3>
                                 <form id="loginForm" onsubmit="return loginfunc(event)" method="POST">
                                     <div class="row">
 
