@@ -10,12 +10,14 @@ $confirm_password = $_POST['confirmpassword'] ?? '';
 $phone = $_POST['phone'] ?? '';
 $gender = $_POST['gender'] ?? '';
 $status = $_POST['status'] ?? '';
+// $image = $_POST['profile_image'] ?? '';
 
 // Handle file upload if available
 $profile_image = '';
+
 if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] == 0) {
     $profile_image = time() . "_" . basename($_FILES['profile_image']['name']);
-    move_uploaded_file($_FILES['profile_image']['tmp_name'], "uploads/" . $profile_image);
+    move_uploaded_file($_FILES['profile_image']['tmp_name'], "assets/images/" . $profile_image);
 }
 $tbl_email = array();
 
@@ -25,7 +27,7 @@ while ($result = $query->fetch(PDO::FETCH_ASSOC)) {
 }
 if (in_array($email, $tbl_email)) {
     $res_msg = array("process_sts" => "NO", "process_msg" => "❌ Email already submitted...Please submit another email!!!");
-} elseif (strlen($phone) != 10) {
+} elseif (!empty($phone) && strlen($phone) != 10) {
     $res_msg = array("process_sts" => "NO", "process_msg" => "⚠️ Phone number must be of 10 digits!!!");
 } elseif ($password != $confirm_password) {
     $res_msg = array("process_sts" => "NO", "process_msg" => "❌ Password must be same as Confirm Password!!!");

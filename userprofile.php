@@ -5,16 +5,25 @@ if (count($_SESSION) == 0) {
     header('Location: login.php');
     exit;
 } else {
+
     include 'includes/connection.php';
     $title = 'User Profile';
     include 'includes/header.php';
     $email = $_SESSION['email'];
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ||
+        $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
+    $host = $_SERVER['HTTP_HOST']; // e.g. localhost or yourdomain.com
+    $projectPath = "/PHPPractice/MainPHPProject1/";
+
+    $base_url = $protocol . $host . $projectPath;
     $result = $conn->query("select * from `users` where `email`='$email'");
     while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         $profile_image = $row['image'];
         if (empty($profile_image)) {
-            $profile_image = 'assets/images/defaultimage.png';
+            $profileimage = $base_url . '/user_management/assets/images/defaultimage.png';
+        } else {
+            $profileimage = $base_url . '/user_management/assets/images/' . $profile_image;
         }
         $name = $row['name'];
         $email = $row['email'];
@@ -36,7 +45,7 @@ if (count($_SESSION) == 0) {
             <div class="media clearfix">
                 <div class="media-left pr30">
                     <a href="#">
-                        <img class="media-object" style="width:400px;" src="<?= $profile_image ?>" alt="profile image">
+                        <img class="media-object" style="width:400px;" src="<?= $profileimage ?>" alt="profile image">
                     </a>
                 </div>
                 <div class="media-body va-m">

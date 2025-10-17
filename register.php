@@ -152,13 +152,24 @@ include 'includes/header.php';
         let status = jQuery('#status').val();
         let confirmpassword = jQuery('#confirm_password').val();
         let gender = jQuery('input[name="gender"]:checked').val();
-        let profile_image = jQuery('#profile_image').val();
+        let profile_image = $('#profile_image')[0].files[0];
+
+        let formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('phone', phone);
+        formData.append('password', password);
+        formData.append('status', status);
+        formData.append('gender', gender);
+        formData.append('confirmpassword', confirmpassword);
+        formData.append('profile_image', profile_image);
 
         jQuery.ajax({
             url: "regpost.php",
             type: "POST",
-            dataType: 'json',
-            data: "name=" + name + "&email=" + email + "&phone=" + phone + "&password=" + password + "&confirmpassword=" + confirmpassword + "&gender=" + gender + "&profile_image=" + profile_image + "&status=" + status,
+            data: formData,
+            contentType: false,
+            processData: false,
             success: function (response) {
 
                 if (response.process_sts == "YES") {
