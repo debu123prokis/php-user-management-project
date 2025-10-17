@@ -1,67 +1,122 @@
 <?php
+session_start();
 
-include 'includes/connection.php';
-$title = 'User Profile';
-include 'includes/header.php';
-?>
+if (count($_SESSION) == 0) {
+    header('Location: login.php');
+    exit;
+} else {
+    include 'includes/connection.php';
+    $title = 'User Profile';
+    include 'includes/header.php';
+    $email = $_SESSION['email'];
 
-<section class="h-100 bg-dark">
-    <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col">
-                <div class="card card-registration my-4">
-                    <div class="row g-0">
-                        <div class="col-xl-6 d-none d-xl-block">
-                            <img src="assets/images/img4.jpg" alt="Sample photo" class="img-fluid"
-                                style="border-top-left-radius: .25rem; border-bottom-left-radius: .25rem;" />
+    $result = $conn->query("select * from `users` where `email`='$email'");
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $profile_image = $row['image'];
+        if (empty($profile_image)) {
+            $profile_image = 'assets/images/defaultimage.png';
+        }
+        $name = $row['name'];
+        $email = $row['email'];
+        $phone = $row['phone'];
+        $gender = $row['gender'];
+        $status = $row['status'];
+        if ($status == 0) {
+            $status = 'Inactive';
+        } else {
+            $status = 'Active';
+        }
+        $joining_date = $row['created_at'];
+    }
+    ?>
+
+    <section id="content" class="container">
+        <!-- Begin .page-heading -->
+        <div class="page-heading">
+            <div class="media clearfix">
+                <div class="media-left pr30">
+                    <a href="#">
+                        <img class="media-object" style="width:400px;" src="<?= $profile_image ?>" alt="profile image">
+                    </a>
+                </div>
+                <div class="media-body va-m">
+                    <h2 class="media-heading"><?= $name ?>
+                        <small> - Profile</small>
+                    </h2>
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <span class="panel-icon">
+                                <i class="fa fa-pencil"></i>
+                            </span>
+                            <span class="panel-title">About Me</span>
                         </div>
-                        <div class="col-xl-6">
-                            <div class="card-body p-md-5 text-black">
-                                <h3 class="mb-5 text-uppercase">User Profile Page</h3>
-                                <form id="loginForm" onsubmit="return loginfunc(event)" method="POST">
-                                    <div class="row">
+                        <div class="panel-body pb5">
 
-                                        <div data-mdb-input-init class="form-outline">
-                                            <input type="email" id="email" name="email"
-                                                class="form-control form-control-lg" />
-                                            <label class="form-label" for="email">Email</label>
-                                        </div>
+                            <h6>Email: <a href="mailto:"><?= $email ?></a></h6>
 
-                                    </div><br><br>
+                            <hr class="short br-lighter">
 
-                                    <div class="row">
+                            <h6>Phone: <?= $phone ?></h6>
 
-                                        <div data-mdb-input-init class="form-outline">
-                                            <input type="password" id="password" name="password"
-                                                class="form-control form-control-lg" />
-                                            <label class="form-label" for="password">Password</label>
-                                        </div>
-                                    </div><br><br>
-                                    <div class="d-flex justify-content-end pt-3">
-                                        <button type="button" id="reset" name="reset" data-mdb-button-init
-                                            data-mdb-ripple-init class="btn btn-primary btn-lg"
-                                            onclick="clearfields()">Reset all</button>
+                            <hr class="short br-lighter">
 
-                                        <a href="register.php"><button type="button" id="signup" name="signup"
-                                                data-mdb-button-init data-mdb-ripple-init
-                                                class="btn btn-warning btn-lg ms-2">Sign
-                                                Up</button></a>
-                                        <button type="submit" id="signin" name="signin" data-mdb-button-init
-                                            data-mdb-ripple-init class="btn btn-warning btn-lg ms-2">Sign
-                                            In</button>
-                                    </div>
-                                </form>
-                            </div>
+                            <h6>Gender: <?= $gender ?></h6>
+                            <hr class="short br-lighter">
+
+                            <h6>Status: <?= $status ?></h6>
+                            <hr class="short br-lighter">
+
+                            <h6>Joined: <?= $joining_date ?></h6>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-<?php include 'includes/footer.php'; ?>
+
+        <div class="row">
+            <div class="col-md-4">
+                <button type="button" id="Logout" name="Logout" data-mdb-button-init data-mdb-ripple-init
+                    class="btn btn-warning btn-lg ms-2" onclick="sessionDestroyfunc()">Logout</button>
+            </div>
+            <div class="col-md-8">
+
+
+            </div>
+        </div>
+    </section>
+    <?php include 'includes/footer.php';
+}
+?>
 
 <script>
+
+    function sessionDestroyfunc() {
+        jQuery.ajax({
+            url: "logoutpost.php",
+            type: "POST",
+            dataType: "json",
+            success: function (response) {
+
+                if (response.process_sts == "YES") {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Submitted!',
+                        text: response.process_msg,
+                        showClass: { popup: 'animate__animated animate__fadeInDown' },
+                        hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+                    });
+                    setTimeout(function () {
+                        window.location.href = 'login.php';
+                    }, 2000); // Reloads after 5 seconds (5000 milliseconds)
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+
+            }
+        });
+    }
 
     function clearfields() {
         jQuery('#email').val('');
@@ -75,10 +130,9 @@ include 'includes/header.php';
         let password = jQuery('#password').val();
 
         jQuery.ajax({
-            url: "loginpost.php",
+            url: "logoutpost.php",
             type: "POST",
             dataType: 'json',
-            data: "email=" + email + "&password=" + password,
             success: function (response) {
 
                 if (response.process_sts == "YES") {
@@ -90,7 +144,7 @@ include 'includes/header.php';
                         hideClass: { popup: 'animate__animated animate__fadeOutUp' }
                     });
                     setTimeout(function () {
-                        location.reload();
+                        window.location.href = "login.php";
                     }, 2000); // Reloads after 5 seconds (5000 milliseconds)
                 } else {
                     Swal.fire({
@@ -101,7 +155,7 @@ include 'includes/header.php';
                         hideClass: { popup: 'animate__animated animate__fadeOutUp' }
                     });
                     setTimeout(function () {
-                        location.reload();
+                        window.location.href = "login.php";
                     }, 2000); // Reloads after 5 seconds (5000 milliseconds)
                 }
             },

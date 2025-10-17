@@ -89,8 +89,9 @@ include 'includes/header.php';
                         showClass: { popup: 'animate__animated animate__fadeInDown' },
                         hideClass: { popup: 'animate__animated animate__fadeOutUp' }
                     });
+
                     setTimeout(function () {
-                        location.reload();
+                        window.location.href = "userprofile.php";
                     }, 2000); // Reloads after 5 seconds (5000 milliseconds)
                 } else {
                     Swal.fire({
