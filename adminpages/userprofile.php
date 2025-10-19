@@ -6,9 +6,9 @@ if (count($_SESSION) == 0) {
     exit;
 } else {
 
-    include 'includes/connection.php';
-    $title = 'User Profile';
-    include 'includes/header.php';
+    include '../includes/connection.php';
+    $title = 'Admin Profile';
+    include '../includes/header.php';
     $email = $_SESSION['email'];
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ||
         $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
@@ -17,18 +17,13 @@ if (count($_SESSION) == 0) {
     $projectPath = "/PHPPractice/MainPHPProject1/";
 
     $base_url = $protocol . $host . $projectPath;
-    $result = $conn->query("select * from `users` where `email`='$email'");
+    $result = $conn->query("select * from `admin` where `email`='$email'");
+    $profileimage = $base_url . '/user_management/assets/images/defaultimage.png';
+
     while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $profile_image = $row['image'];
-        if (empty($profile_image)) {
-            $profileimage = $base_url . '/assets/images/defaultimage.png';
-        } else {
-            $profileimage = $base_url . '/user_management/assets/images/' . $profile_image;
-        }
+
         $id = $row['id'];
-        $name = $row['name'];
-        $phone = $row['phone'];
-        $gender = $row['gender'];
+        $name = $row['username'];
         $status = $row['status'];
         $password = $row['password'];
 
@@ -44,10 +39,6 @@ if (count($_SESSION) == 0) {
         $_SESSION['name'] = $name;
         $_SESSION['email'] = $email;
         $_SESSION['password'] = $password;
-        $_SESSION['phone'] = $phone;
-        $_SESSION['profile_image'] = $profile_image;
-        $_SESSION['gender'] = $gender;
-        $_SESSION['completeprofileimage'] = $profileimage;
         $joining_date = $row['created_at'];
     }
     ?>
@@ -55,46 +46,39 @@ if (count($_SESSION) == 0) {
     <section id="content" class="container">
         <!-- Begin .page-heading -->
         <div class="page-heading">
-            <div class="media clearfix">
-                <div class="media-left pr30">
-                    <a href="#">
-                        <img class="media-object" style="width:400px;" src="<?= $profileimage ?>" alt="profile image">
-                    </a>
+            <div class="media" style="display: flex; align-items: flex-start; gap: 30px;">
+
+                <!-- Left: Profile Image -->
+                <div class="media-left">
+                    <img class="media-object" style="width: 200px; height: 200px; border-radius: 10px; object-fit: cover;"
+                        src="<?= $profileimage ?>" alt="profile image">
                 </div>
+
+                <!-- Right: About Me -->
                 <div class="media-body va-m">
                     <h2 class="media-heading"><?= $name ?>
                         <small> - Profile</small>
-                    </h2>
-                    <div class="panel">
+                    </h2><br>
+
+                    <div class="panel" style="max-width: 500px;">
                         <div class="panel-heading">
                             <span class="panel-icon">
                                 <i class="fa fa-pencil"></i>
                             </span>
                             <span class="panel-title">About Me</span>
-                        </div>
+                        </div><br>
+
                         <div class="panel-body pb5">
-
-                            <h6>Email: <a href="mailto:"><?= $email ?></a></h6>
-
+                            <h6>Email: <a href="mailto:<?= $email ?>"><?= $email ?></a></h6>
                             <hr class="short br-lighter">
-
-                            <h6>Phone: <?= $phone ?></h6>
-
-                            <hr class="short br-lighter">
-
-                            <h6>Gender: <?= $gender ?></h6>
-                            <hr class="short br-lighter">
-
                             <h6>Status: <?= $status ?></h6>
                             <hr class="short br-lighter">
-
                             <h6>Joined: <?= $joining_date ?></h6>
-
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div><br><br><br>
 
         <div class="row">
             <div class="col-md-4">
@@ -107,7 +91,7 @@ if (count($_SESSION) == 0) {
             </div>
         </div>
     </section>
-    <?php include 'includes/footer.php';
+    <?php include '../includes/footer.php';
 }
 ?>
 
